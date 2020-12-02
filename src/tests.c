@@ -32,7 +32,11 @@ void ECDSA_SIG_get0(const ECDSA_SIG *sig, const BIGNUM **pr, const BIGNUM **ps) 
 #include "contrib/lax_der_parsing.c"
 #include "contrib/lax_der_privatekey_parsing.c"
 
+#ifdef __TRUSTINSOFT_ANALYZER__
+static int count = 1;
+#else
 static int count = 64;
+#endif
 static secp256k1_context *ctx = NULL;
 
 static void counting_illegal_callback_fn(const char* str, void* data) {
@@ -5614,133 +5618,192 @@ void run_cmov_tests(void) {
     ge_storage_cmov_test();
 }
 
-int main(int argc, char **argv) {
-    /* Disable buffering for stdout to improve reliability of getting
-     * diagnostic information. Happens right at the start of main because
-     * setbuf must be used before any other operation on the stream. */
-    setbuf(stdout, NULL);
-    /* Also disable buffering for stderr because it's not guaranteed that it's
-     * unbuffered on all systems. */
-    setbuf(stderr, NULL);
+void run_tis_interpreter_secp256k1_testrand_init(void) {
+    secp256k1_testrand_init(NULL);
+}
 
-    /* find iteration count */
-    if (argc > 1) {
-        count = strtol(argv[1], NULL, 0);
-    } else {
-        const char* env = getenv("SECP256K1_TEST_ITERS");
-        if (env) {
-            count = strtol(env, NULL, 0);
-        }
-    }
-    if (count <= 0) {
-        fputs("An iteration count of 0 or less is not allowed.\n", stderr);
-        return EXIT_FAILURE;
-    }
-    printf("test count = %i\n", count);
+void run_tis_interpreter_test_002(void) {
+    /* too slow: still running after 2h 13m */
+    run_context_tests(0);
+}
+
+void run_tis_interpreter_test_003(void) {
+    /* too slow */
+    run_context_tests(1);
+}
+
+void run_tis_interpreter_tests(void) {
+    printf("1. t=%d\n", 1);
 
     /* find random seed */
-    secp256k1_testrand_init(argc > 2 ? argv[2] : NULL);
+    secp256k1_testrand_init(NULL); /* duplicated */
+    printf("2. t=%d\n", 1);
 
     /* initialize */
-    run_context_tests(0);
-    run_context_tests(1);
-    run_scratch_tests();
+    /* run_context_tests(0); */
+    printf("3. t=%d\n", 1);
+    /* run_context_tests(1); */
+    printf("4. t=%d\n", 1);
+    /* run_scratch_tests(); */
     ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+    printf("5. t=%d\n", 1);
     if (secp256k1_testrand_bits(1)) {
         unsigned char rand32[32];
+        printf("6. t=%d\n", 1);
         secp256k1_testrand256(rand32);
         CHECK(secp256k1_context_randomize(ctx, secp256k1_testrand_bits(1) ? rand32 : NULL));
     }
+    printf("7. t=%d\n", 1);
 
     run_rand_bits();
+    printf("8. t=%d\n", 1);
     run_rand_int();
+    printf("9. t=%d\n", 1);
 
-    run_sha256_tests();
-    run_hmac_sha256_tests();
-    run_rfc6979_hmac_sha256_tests();
+    /* run_sha256_tests(); */
+    /* run_hmac_sha256_tests(); */
+    /* run_rfc6979_hmac_sha256_tests(); */
 
 #ifndef USE_NUM_NONE
     /* num tests */
     run_num_smalltests();
 #endif
+    printf("10. t=%d\n", 1);
 
     /* scalar tests */
     run_scalar_tests();
+    printf("11. t=%d\n", 1);
 
     /* field tests */
-    run_field_inv();
-    run_field_inv_var();
-    run_field_inv_all_var();
-    run_field_misc();
-    run_field_convert();
-    run_sqr();
-    run_sqrt();
+    /* run_field_inv(); */
+    /* run_field_inv_var(); */
+    /* run_field_inv_all_var(); */
+    /* run_field_misc(); */
+    /* run_field_convert(); */
+    /* run_sqr(); */
+    /* run_sqrt(); */
 
     /* group tests */
-    run_ge();
-    run_group_decompress();
+    /* run_ge(); */
+    /* run_group_decompress(); */
 
     /* ecmult tests */
-    run_wnaf();
+    /* run_wnaf(); */
     run_point_times_order();
+    printf("12. t=%d\n", 1);
     run_ecmult_near_split_bound();
+    printf("13. t=%d\n", 1);
     run_ecmult_chain();
+    printf("14. t=%d\n", 1);
     run_ecmult_constants();
+    printf("15. t=%d\n", 1);
     run_ecmult_gen_blind();
-    run_ecmult_const_tests();
+    printf("16. t=%d\n", 1);
+    /* run_ecmult_const_tests(); */
     run_ecmult_multi_tests();
+    printf("17. t=%d\n", 1);
     run_ec_combine();
+    printf("18. t=%d\n", 1);
 
     /* endomorphism tests */
-    run_endomorphism_tests();
+    /* run_endomorphism_tests(); */
 
     /* EC point parser test */
     run_ec_pubkey_parse_test();
+    printf("19. t=%d\n", 1);
 
     /* EC key edge cases */
     run_eckey_edge_case_test();
+    printf("20. t=%d\n", 1);
 
     /* EC key arithmetic test */
     run_eckey_negate_test();
+    printf("21. t=%d\n", 1);
 
 #ifdef ENABLE_MODULE_ECDH
     /* ecdh tests */
     run_ecdh_tests();
 #endif
+    printf("22. t=%d\n", 1);
 
     /* ecdsa tests */
-    run_random_pubkeys();
+    /* run_random_pubkeys(); */
     run_ecdsa_der_parse();
+    printf("23. t=%d\n", 1);
     run_ecdsa_sign_verify();
+    printf("24. t=%d\n", 1);
     run_ecdsa_end_to_end();
+    printf("25. t=%d\n", 1);
     run_ecdsa_edge_cases();
+    printf("26. t=%d\n", 1);
 #ifdef ENABLE_OPENSSL_TESTS
     run_ecdsa_openssl();
 #endif
+    printf("27. t=%d\n", 1);
 
 #ifdef ENABLE_MODULE_RECOVERY
     /* ECDSA pubkey recovery tests */
     run_recovery_tests();
 #endif
+    printf("28. t=%d\n", 1);
 
 #ifdef ENABLE_MODULE_EXTRAKEYS
     run_extrakeys_tests();
 #endif
+    printf("29. t=%d\n", 1);
 
 #ifdef ENABLE_MODULE_SCHNORRSIG
     run_schnorrsig_tests();
 #endif
+    printf("30. t=%d\n", 1);
 
     /* util tests */
-    run_secp256k1_memczero_test();
+    /* run_secp256k1_memczero_test(); */
 
-    run_cmov_tests();
+    /* run_cmov_tests(); */
 
     secp256k1_testrand_finish();
+    printf("31. t=%d\n", 1);
 
     /* shutdown */
     secp256k1_context_destroy(ctx);
+    printf("32. t=%d\n", 1);
 
     printf("no problems found\n");
+}
+
+int run_tis_interpreter_ecdsa_der_parse(void) {
+    ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+    run_ecdsa_der_parse();
+    secp256k1_context_destroy(ctx);
+    return 0;
+}
+
+int run_tis_interpreter_ecdsa_sign_verify(void) {
+    ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+    run_ecdsa_sign_verify();
+    secp256k1_context_destroy(ctx);
+    return 0;
+}
+
+int run_tis_interpreter_ecdsa_end_to_end(void) {
+    ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+    test_ecdsa_end_to_end();
+    secp256k1_context_destroy(ctx);
+    return 0;
+}
+
+int run_tis_interpreter_ecdsa_edge_cases(void) {
+    ctx = secp256k1_context_create(SECP256K1_CONTEXT_SIGN | SECP256K1_CONTEXT_VERIFY);
+    run_ecdsa_edge_cases();
+    secp256k1_context_destroy(ctx);
+    return 0;
+}
+
+int main(int argc, char **argv) {
+    run_tis_interpreter_ecdsa_der_parse();
+    run_tis_interpreter_ecdsa_sign_verify();
+    run_tis_interpreter_ecdsa_end_to_end();
+    run_tis_interpreter_ecdsa_edge_cases();
     return 0;
 }

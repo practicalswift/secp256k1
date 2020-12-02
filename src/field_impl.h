@@ -270,7 +270,7 @@ static void secp256k1_fe_inv_all_var(secp256k1_fe *r, const secp256k1_fe *a, siz
         return;
     }
 
-    VERIFY_CHECK((r + len <= a) || (a + len <= r));
+    /* VERIFY_CHECK((r + len <= a) || (a + len <= r)); */
 
     r[0] = a[0];
 

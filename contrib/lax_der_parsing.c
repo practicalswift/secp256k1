@@ -134,7 +134,9 @@ int ecdsa_signature_parse_der_lax(const secp256k1_context* ctx, secp256k1_ecdsa_
     if (slen > 32) {
         overflow = 1;
     } else {
-        memcpy(tmpsig + 64 - slen, input + spos, slen);
+        if (slen != 0) {
+            memcpy(tmpsig + 64 - slen, input + spos, slen);
+        }
     }
 
     if (!overflow) {
